@@ -1,5 +1,5 @@
 ---
-title: "無料枠で個人アプリをデプロイする。5 層を実際に比べた"
+title: "無料枠で個人アプリをデプロイする場合のサービスについて比較してみた"
 emoji: "🍔"
 type: "tech"
 topics: ["cloudrun", "neon", "cloudflare", "個人開発", "go"]
