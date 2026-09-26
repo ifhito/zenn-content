@@ -379,7 +379,7 @@ Render Static Site は `routes` の Rewrite、Netlify は `_redirects` 相当の
 | メール | Resend |
 | フロント | Cloudflare Workers |
 
-この構成で公開しているアプリは、[BurgerStack](https://burger-stack.com/)から確認できます。
+こちらが、今回の構成で公開しているハンバーガー評価アプリの [BurgerStack](https://burger-stack.com/) です。よかったら見てみてください。
 
 完全無料で組める構成は見つかりませんでした。Cloud Run と R2 はカード登録が必要です。予算アラートは支払いを止めないので、上限を超えたときに自分で止める覚悟は要ります。
 
