@@ -105,7 +105,7 @@ PostgreSQL 互換の DB にも、分散 SQL やマルチテナントなど特徴
 
 ### 今回比べた 4 つ
 
-アプリのアダプタが使うのは S3 互換の `PutObject` と `DeleteObject` だけで、公開 URL からそのまま配信します。なので「S3 互換で、公開配信できること」が条件です。このアプリは保存時に縮小まで済ませているので、変換特化のサービスには出番がありませんでした。
+アプリのアダプタが使うのは S3 互換の `PutObject` と `DeleteObject` だけで、公開 URL からそのまま配信します。なので「S3 互換で、公開配信できること」が条件です。このアプリは保存時に写真を縮小するため、配信時の変換機能は使っていません。ただ、変換機能の有無にかかわらず、画像の保存や配信をサービスに任せる選び方もできます。今回は既存の S3 アダプタを使えるサービスを比べました。
 
 ストレージは、保存容量と転送量の両方が料金にどう響くかを見ていました。写真は保存したあとも何度も配信するので、転送料金も気になります。今回は、とにかく費用を抑えたかったんですよね。
 
@@ -155,7 +155,7 @@ R2 はアップロードに使う S3 API のエンドポイントと、画像を
 
 ### ほかの選択肢
 
-S3 互換のストレージなら Wasabi や Storj も候補になります。ただ、少量の写真を置く場合は最低料金が気になります。画像の変換やアップロード画面も任せたいなら、Cloudflare Images や ImageKit など別のタイプのサービスもあります。
+S3 互換のストレージなら Wasabi や Storj も候補になります。ただ、少量の写真を置く場合は最低料金が気になります。Cloudflare Images や ImageKit などは、画像変換を使わずに保存・配信先として利用することもできます。現在の S3 アダプタとは別の API を組み込む必要がありますが、写真の保存や配信をまとめて任せたい場合には候補になりそうです。
 
 ## 3. メール送信
 
@@ -406,8 +406,8 @@ Render Static Site は `routes` の Rewrite、Netlify は `_redirects` 相当の
 |---|---|
 | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | S3 API ではなく、専用 SDK を使うサービスです。 |
 | [Bunny Storage](https://bunny.net/storage/) | 独自 REST API のため、既存の S3 アダプタを使えません。 |
-| [Cloudflare Images](https://www.cloudflare.com/developer-platform/products/cloudflare-images/) | 保存・変換・配信をまとめて任せる画像サービスで、今回の単純な保存用途とは異なります。 |
-| [ImageKit](https://imagekit.io/)、[Cloudinary](https://cloudinary.com/)、[Uploadcare](https://uploadcare.com/)、[UploadThing](https://uploadthing.com/) | 画像変換やアップロード UI も含むサービスで、今回は必要としませんでした。 |
+| [Cloudflare Images](https://www.cloudflare.com/developer-platform/products/cloudflare-images/) | 画像を保存・配信できます。変換を使わずに保存・配信先として利用することもできますが、保存と配信は有料です。 |
+| [ImageKit](https://imagekit.io/)、[Cloudinary](https://cloudinary.com/)、[Uploadcare](https://uploadcare.com/)、[UploadThing](https://uploadthing.com/) | 画像のアップロードや配信を担うサービスです。変換機能を使わずに利用することもできますが、既存の S3 アダプタとは別の組み込みが必要です。 |
 | [Amazon S3](https://aws.amazon.com/s3/)、[Google Cloud Storage](https://cloud.google.com/storage)、[Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs) | 利用条件や API が異なり、長期無料で同じ条件にそろえる比較から外しました。 |
 | [Wasabi](https://wasabi.com/cloud-object-storage) | S3 互換ですが、最低課金量が今回の少量利用に合いません。 |
 | [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces)、[Hetzner Object Storage](https://www.hetzner.com/storage/object-storage/) | 月額やリージョンなど、今回の無料枠中心の条件とは異なります。 |
