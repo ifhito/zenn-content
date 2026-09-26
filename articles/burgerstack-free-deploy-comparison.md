@@ -90,16 +90,16 @@ Neon は普段の API であれば pooler 用 URL で動きました。ただ、
 
 ### ほかの選択肢
 
-今回の実装を大きく変えずに試せそうな候補として、PostgreSQL 互換のサービスを残しました。ほかの DB や運用方法に切り替える候補は、理由とあわせて付録にまとめています。
+PostgreSQL 互換の DB にも、分散 SQL やマルチテナントなど特徴の違うサービスがあります。今回使ったクエリとの互換性は確かめる必要がありますが、Aurora DSQL や CockroachDB Cloud は機会があれば試してみたいです。
 
 | サービス | 気になっている点 |
 |---|---|
-| [Aurora DSQL](https://aws.amazon.com/rds/aurora/dsql/) | PostgreSQL 互換の分散 SQL。実アプリで互換性を確かめたい。 |
-| [Aiven for PostgreSQL](https://aiven.io/postgresql) | 素の PostgreSQL を使える無料枠がある。 |
-| [Prisma Postgres](https://www.prisma.io/postgres) | 無料枠あり。Prisma ORM を使う構成なら候補になる。 |
-| [Nile](https://www.thenile.dev/) | マルチテナントの B2B アプリ向け PostgreSQL。 |
-| [CockroachDB Cloud](https://www.cockroachlabs.com/cockroachdb/pricing/) | 無料枠のある分散 SQL。`FOR UPDATE SKIP LOCKED` との互換性は確認したい。 |
-| [YugabyteDB Aeon](https://www.yugabyte.com/cloud/) | 無料 Sandbox がある分散 SQL。単一ノードやバックアップなしなどの制約がある。 |
+| [Aurora DSQL](https://aws.amazon.com/rds/aurora/dsql/) | PostgreSQL 互換の分散 SQL。実アプリで互換性を確かめてみたい。 |
+| [Aiven for PostgreSQL](https://aiven.io/postgresql) | 素の PostgreSQL を使える無料枠があり、既存の実装に合わせやすそうです。 |
+| [Prisma Postgres](https://www.prisma.io/postgres) | 無料枠があります。Prisma ORM を使うアプリなら検討しやすそうです。 |
+| [Nile](https://www.thenile.dev/) | マルチテナントの B2B アプリ向け PostgreSQL です。 |
+| [CockroachDB Cloud](https://www.cockroachlabs.com/cockroachdb/pricing/) | 無料枠のある分散 SQL。`FOR UPDATE SKIP LOCKED` との互換性を確かめてみたいです。 |
+| [YugabyteDB Aeon](https://www.yugabyte.com/cloud/) | 無料 Sandbox がある分散 SQL。単一ノードやバックアップなしなどの制約があります。 |
 
 ## 2. 写真ストレージ
 
@@ -145,7 +145,7 @@ Neon は普段の API であれば pooler 用 URL で動きました。ただ、
 
 B2 では普段のアカウント情報ではなく、App Key を使う形になると思います。keyID を S3 の Access Key ID、applicationKey を Secret Access Key として設定することで接続できました。
 
-R2 はアップロードに使う S3 API のエンドポイントと、画像を表示するための公開 URL を分けて考える必要があると思います。`*.r2.dev` は開発用とのことなので、本番で使う場合は独自ドメインを用意する形になりそうです。
+R2 はアップロードに使う S3 API のエンドポイントと、画像を表示するための公開 URL を分けて考える必要があると思います。`*.r2.dev` の URL はすぐ使えますが、レート制限があり、本番用途には推奨されていません。Cloudflare のキャッシュを使う場合も独自ドメインが必要です。すぐに使えなくなるという話ではありませんが、公開後の配信には独自ドメインを設定するのがよさそうです。
 
 どちらもコードを変えるというより、管理画面に書かれている値をどこへ設定するかを確認することが重要だと思います。
 
@@ -155,7 +155,7 @@ R2 はアップロードに使う S3 API のエンドポイントと、画像を
 
 ### ほかの選択肢
 
-今回のアプリでは、既存の S3 アダプタをそのまま使えることも条件でした。ほかの API が必要なストレージや、画像変換を任せるサービスなどは付録にまとめています。今の構成にそのまま足せる有力候補は、今回比べた4社以外には見つかりませんでした。
+S3 互換のストレージなら Wasabi や Storj も候補になります。ただ、少量の写真を置く場合は最低料金が気になります。画像の変換やアップロード画面も任せたいなら、Cloudflare Images や ImageKit など別のタイプのサービスもあります。
 
 ## 3. メール送信
 
@@ -211,7 +211,7 @@ Resend の共有ドメインは送信先が限られていました。開発中�
 
 ### ほかの選択肢
 
-送信量だけを見ると、Mailgun と Postmark も候補になります。どちらも今回の数通/日なら通数は足りるため、付録にはそれ以外のサービスや、登録条件が合わなかったものをまとめました。
+今回のように1日に数通送る使い方なら、Mailgun や Postmark の無料枠でも足りると思います。トランザクションメールに絞って選びたい場合は、Postmark も候補になりそうです。
 
 | サービス | 今回の用途で見た点 |
 |---|---|
