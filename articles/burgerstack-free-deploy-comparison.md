@@ -155,7 +155,15 @@ R2 はアップロードに使う S3 API のエンドポイントと、画像を
 
 ### ほかの選択肢
 
-S3 互換のストレージなら Wasabi や Storj も候補になります。ただ、少量の写真を置く場合は最低料金が気になります。Cloudflare Images や ImageKit などは、画像変換を使わずに保存・配信先として利用することもできます。現在の S3 アダプタとは別の API を組み込む必要がありますが、写真の保存や配信をまとめて任せたい場合には候補になりそうです。
+画像の変換を使わなくても、写真の保存と配信をまとめて任せられるサービスがあります。既存の S3 アダプタとは別の API を組み込む必要がありますが、無料枠のあるサービスも候補になります。
+
+| サービス | 保存・配信の条件 |
+|---|---|
+| [ImageKit](https://imagekit.io/plans) | 無料で保存 3GB、転送 20GB/月まで。上限に達すると新しいアップロードや配信が止まります。 |
+| [Cloudinary](https://cloudinary.com/pricing) | 無料枠は月 25 クレジット。保存・画像転送・変換で共通の枠を使い、変換なしでも保存と配信に使えます。 |
+| [Uploadcare](https://uploadcare.com/pricing/) | 個人利用なら無料で保存 1GB、転送 5GB/月、操作 1,000 回まで。 |
+| [UploadThing](https://uploadthing.com/) | 無料でアプリ間共有の保存 2GB、アップロード・ダウンロードは無制限。Go API から使うには REST API を組み込む必要があります。 |
+| [Cloudflare Images](https://developers.cloudflare.com/images/pricing/) | 画像の保存は有料プランが必要です。保存は 10 万枚あたり $5/月、配信は 10 万回あたり $1。 |
 
 ## 3. メール送信
 
@@ -406,8 +414,6 @@ Render Static Site は `routes` の Rewrite、Netlify は `_redirects` 相当の
 |---|---|
 | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | S3 API ではなく、専用 SDK を使うサービスです。 |
 | [Bunny Storage](https://bunny.net/storage/) | 独自 REST API のため、既存の S3 アダプタを使えません。 |
-| [Cloudflare Images](https://www.cloudflare.com/developer-platform/products/cloudflare-images/) | 画像を保存・配信できます。変換を使わずに保存・配信先として利用することもできますが、保存と配信は有料です。 |
-| [ImageKit](https://imagekit.io/)、[Cloudinary](https://cloudinary.com/)、[Uploadcare](https://uploadcare.com/)、[UploadThing](https://uploadthing.com/) | 画像のアップロードや配信を担うサービスです。変換機能を使わずに利用することもできますが、既存の S3 アダプタとは別の組み込みが必要です。 |
 | [Amazon S3](https://aws.amazon.com/s3/)、[Google Cloud Storage](https://cloud.google.com/storage)、[Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs) | 利用条件や API が異なり、長期無料で同じ条件にそろえる比較から外しました。 |
 | [Wasabi](https://wasabi.com/cloud-object-storage) | S3 互換ですが、最低課金量が今回の少量利用に合いません。 |
 | [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces)、[Hetzner Object Storage](https://www.hetzner.com/storage/object-storage/) | 月額やリージョンなど、今回の無料枠中心の条件とは異なります。 |
