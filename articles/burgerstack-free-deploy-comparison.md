@@ -90,60 +90,16 @@ Neon は普段の API であれば pooler 用 URL で動きました。ただ、
 
 ### ほかの選択肢
 
-以下は今回のアプリでは使いませんでしたが、別の実装や用途なら候補になり得るサービスです。
+今回の実装を大きく変えずに試せそうな候補として、PostgreSQL 互換のサービスを残しました。ほかの DB や運用方法に切り替える候補は、理由とあわせて付録にまとめています。
 
-| 区分 | サービス |
+| サービス | 気になっている点 |
 |---|---|
-| 今回のコードをそのままでは使えない | Cloudflare D1(アプリ側の移行が必要)、MongoDB Atlas / DynamoDB(データモデルの変更が必要) |
-| 別の道具に乗り換えることになる | PlanetScale、TiDB Serverless(MySQL)、Turso、SQLite + Litestream |
-| 今後試したい | Aurora DSQL、Aiven、Prisma Postgres、Nile、CockroachDB、YugabyteDB |
-| 無料で始められない | Fly Postgres |
-| 個人には運用が重い | Oracle Cloud の VM に自前構築 |
-| 登録できなかった | Koyeb Postgres |
-
-選ばなかったものの概要です。料金と運営は 2026 年 9 月に公式ページで確かめました。
-
-**今のアプリに合わせるには変更が必要**
-
-今回は既存の Go + PostgreSQL の実装を変えずに動かす条件です。次の候補は DB の種類や接続方法が異なるため、使うにはアプリ側の変更が要ります。
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Cloudflare D1](https://developers.cloudflare.com/d1/) | PostgreSQL ではなく SQLite ベースの Workers 向け DB。無料枠は読み 500 万行/日、書き 10 万行/日、5GB。Workers を使う API への移行が必要です。 |
-| [MongoDB Atlas](https://www.mongodb.com/atlas) | ドキュメント DB。M0 は 512MB で永久無料。JSON 中心でリレーションや外部キーを必要としないアプリ向けです。 |
-| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | サーバーレスのキーバリュー DB。常時無料枠は 25GB、25 WCU・25 RCU。キー指定の読み書きが中心のアプリ向けです。 |
-
-**別の道具に乗り換えることになる**
-
-PostgreSQL 以外へ移る場合は pgx、sqlc のクエリやマイグレーションも見直す必要があります。
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [PlanetScale](https://planetscale.com/) | MySQL(Vitess / Neki)と PostgreSQL のマネージド DB。無料枠はなく、Postgres の単一ノードは $10/月から。 |
-| [TiDB Cloud Starter](https://www.pingcap.com/tidb-cloud-serverless/) | MySQL 互換のサーバーレス分散 SQL。1 インスタンスあたり 5GiB + 5GiB、5,000 万 RU/月の無料枠があり、東京も選べます。 |
-| [Turso](https://turso.tech/) | SQLite / libSQL 系。無料で 5GB、DB 100 個、読み 5 億行/月まで使えます。 |
-| [Litestream](https://litestream.io/) | SQLite の変更を S3 などに複製する OSS ツール。単一 VM + SQLite のバックアップ用途で、サービス自体は無料です。 |
-
-**今後試したい Postgres 系サービス**
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Amazon Aurora DSQL](https://aws.amazon.com/rds/aurora/dsql/) | PostgreSQL 互換の分散 SQL。毎月 10 万 DPU と 1GB が無料。外部キーとシーケンスは現在サポートされています。今回は未検証のため、実アプリで互換性を確かめたい候補です。 |
-| [Aiven for PostgreSQL](https://aiven.io/postgresql) | 素の PostgreSQL のマネージドサービス。1 CPU・1GB RAM・1GB の無料枠が期限なしで利用できます。 |
-| [Prisma Postgres](https://www.prisma.io/postgres) | 操作数課金のマネージド PostgreSQL。無料で 500MB、20 万操作/月まで。Prisma ORM を使うアプリ向けです。 |
-| [Nile](https://www.thenile.dev/) | マルチテナント B2B アプリ向け PostgreSQL。無料枠は 1GB、5,000 万クエリトークン/月です。 |
-| [CockroachDB Cloud](https://www.cockroachlabs.com/cockroachdb/pricing/) | 分散 SQL。新規 Basic 組織は毎月 5,000 万 RU と 10GiB まで無料。`FOR UPDATE SKIP LOCKED` との互換性確認が必要です。 |
-| [YugabyteDB Aeon](https://www.yugabyte.com/cloud/) | 分散 SQL。Sandbox は永久無料で最大 2 vCPU・4GB・10GB。単一ノードでバックアップがなく、無操作で停止・削除される制約があります。 |
-
-**無料で始められない・運用が重い・登録できなかった**
-
-このグループは無料で始められることや、一人で運用できるという今回の条件に合わなかったサービスです。
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Fly.io Managed Postgres](https://fly.io/docs/mpg/) | マネージド PostgreSQL。無料枠はなく、Basic は $38/月からです。 |
-| [Oracle Cloud Always Free](https://www.oracle.com/cloud/free/) | 無料 VM に自分で PostgreSQL を構築できますが、OS 更新やバックアップなどの運用が必要です。低利用が続く VM は回収される場合があります。 |
-| [Koyeb Postgres](https://www.koyeb.com/docs/databases) | マネージド PostgreSQL。検証時は利用登録ができず、今回の測定には含められませんでした。 |
+| [Aurora DSQL](https://aws.amazon.com/rds/aurora/dsql/) | PostgreSQL 互換の分散 SQL。実アプリで互換性を確かめたい。 |
+| [Aiven for PostgreSQL](https://aiven.io/postgresql) | 素の PostgreSQL を使える無料枠がある。 |
+| [Prisma Postgres](https://www.prisma.io/postgres) | 無料枠あり。Prisma ORM を使う構成なら候補になる。 |
+| [Nile](https://www.thenile.dev/) | マルチテナントの B2B アプリ向け PostgreSQL。 |
+| [CockroachDB Cloud](https://www.cockroachlabs.com/cockroachdb/pricing/) | 無料枠のある分散 SQL。`FOR UPDATE SKIP LOCKED` との互換性は確認したい。 |
+| [YugabyteDB Aeon](https://www.yugabyte.com/cloud/) | 無料 Sandbox がある分散 SQL。単一ノードやバックアップなしなどの制約がある。 |
 
 ## 2. 写真ストレージ
 
@@ -199,58 +155,7 @@ R2 はアップロードに使う S3 API のエンドポイントと、画像を
 
 ### ほかの選択肢
 
-今回は既存の S3 アダプタを使えるサービスを比較しました。以下は別の API や設定が必要ですが、用途に合えば候補になるサービスです。
-
-| 区分 | サービス |
-|---|---|
-| S3 互換ではないため今回の比較対象外 | Vercel Blob、Bunny Storage |
-| 今回の用途と違う(画像変換に特化) | Cloudflare Images、ImageKit、Cloudinary、Uploadcare / Uploadthing |
-| 無料枠がない、または期限付き | AWS S3、Google Cloud Storage、Azure Blob、Wasabi、DigitalOcean Spaces、Hetzner |
-| 運用が重い、条件が読めない | MinIO(セルフホスト)、Storj、Render Disk |
-
-選ばなかったものの概要です。
-
-**S3 互換ではないため今回の比較対象外**
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | 独自 SDK(`@vercel/blob`)で使う Vercel 向けストレージ。Hobby は保存 1GB・転送 10GB/月まで。Vercel/Next.js とまとめて使う場合の候補です。 |
-| [Bunny Storage](https://bunny.net/storage/) | 独自 REST API の CDN 直結ストレージ。14 日試用後は $0.01/GB 月、最低 $1/月。Bunny CDN への転送は無料です。 |
-
-専用 SDK や別 API のため、今回の S3 アダプタを使う比較には含めていません。
-
-**画像変換・アップロード機能が必要な場合の候補**
-
-このアプリは保存前に画像を縮小するため、配信時の変換機能は使っていません。画像加工やアップロード UI もサービス側に任せたい場合の候補です。
-
-| サービス | 概要と料金 |
-|---|---|
-| [Cloudflare Images](https://www.cloudflare.com/developer-platform/products/cloudflare-images/) | 画像の保存・変換・配信。変換は月 5,000 ユニークまで無料、保存は $5/10 万枚月、配信は $1/10 万枚です。 |
-| [ImageKit](https://imagekit.io/) | 外部ストレージの前段で画像変換と CDN 配信を提供。無料枠は帯域 20GB/月・保存 3GB、有料は $9/月からです。 |
-| [Cloudinary](https://cloudinary.com/) | 画像・動画の管理、AI 変換、配信。無料は 25 クレジット/月でカード不要、有料は $89/月からです。 |
-| [Uploadcare](https://uploadcare.com/) | アップロード UI・保存・画像処理・CDN を提供。無料は操作 1,000 回/月・保存 1GB・転送 5GB(個人利用のみ)です。 |
-| [UploadThing](https://uploadthing.com/) | TypeScript アプリ向けアップロード SaaS。無料で保存 2GB、有料は $10/月(100GB)です。 |
-
-**無料枠がない、または期限付き**
-
-今回は長く無料で使えることと転送コストを重視したため、次のサービスは比較枠に入れませんでした。
-
-| サービス | 概要と料金 |
-|---|---|
-| [Amazon S3](https://aws.amazon.com/s3/) | S3 API の本家。新規は6か月・最大 $200 のクレジット方式で、その後は保存 $0.0265/GB 月、転送 $0.09/GB です。 |
-| [Google Cloud Storage](https://cloud.google.com/storage) | XML API は S3 互換ツールと相互運用できます。Always Free は米国限定で保存 5GB、北米向け転送 100GB/月です。 |
-| [Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs) | Azure 独自 REST API。新規無料アカウントは $200 クレジット(30日)と12か月の無料枠があり、カード登録が必要です。 |
-| [Wasabi](https://wasabi.com/cloud-object-storage) | S3 互換で egress と API 呼び出しは無料。$7.99/TB 月、最低課金は1TB分です。 |
-| [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces) | CDN 内蔵の S3 互換ストレージ。$5/月で保存 250GiB・転送 1TiB 込みです。 |
-| [Hetzner Object Storage](https://www.hetzner.com/storage/object-storage/) | 欧州3拠点の S3 互換ストレージ。保存 1TB と egress 1TB 込みですが、価格はページから確認できませんでした。 |
-
-**運用が重い、今回の条件に合わない**
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [MinIO](https://www.min.io/) | 自前で動かす S3 互換ストレージ。旧 OSS 版はメンテナンス終了、現行 AIStor Free は単一ノードです。本検証では開発環境で S3 API の動作確認に使いました。 |
-| [Storj](https://www.storj.io/) | 分散型 S3 互換ストレージ。30 日試用後は保存・egress とも $7/TB 月、最低 $5/月です。 |
-| [Render Disks](https://render.com/docs/disks) | インスタンスにマウントするブロックストレージ。$0.25/GB 月で、無料 Web サービスには付けられず、水平スケールも制限されます。 |
+今回のアプリでは、既存の S3 アダプタをそのまま使えることも条件でした。ほかの API が必要なストレージや、画像変換を任せるサービスなどは付録にまとめています。今の構成にそのまま足せる有力候補は、今回比べた4社以外には見つかりませんでした。
 
 ## 3. メール送信
 
@@ -306,55 +211,12 @@ Resend の共有ドメインは送信先が限られていました。開発中�
 
 ### ほかの選択肢
 
-今回は SMTP で送れることを条件にしました。以下は別の送信方法や登録条件が関わり、まだ実際のアプリでは試していない候補です。
+送信量だけを見ると、Mailgun と Postmark も候補になります。どちらも今回の数通/日なら通数は足りるため、付録にはそれ以外のサービスや、登録条件が合わなかったものをまとめました。
 
-| 区分 | サービス |
+| サービス | 今回の用途で見た点 |
 |---|---|
-| 登録の障壁で失格 | SMTP2GO(フリーメール不可)、SendGrid(審査で止まる報告が多い)、Amazon SES(サンドボックス解除の申請が要る) |
-| 規約上、本番で使えない | Gmail SMTP、Outlook SMTP |
-| 今回の少量送信では追加比較の必要が薄い | Mailgun(100 通/日)、Postmark(100 通/月) |
-| 試用枠のみ | ZeptoMail(初回 1 万通のみ) |
-| 立地や条件が合わない | Scaleway(EU のみ)、Elastic Email、Loops / Plunk |
-
-選ばなかったものの概要です。今回のアプリは送信が1日数通のため、Mailgun の100通/日でも十分足ります。送信上限を増やす必要がなかったので、今回は他の観点が異なるサービスを優先して比べました。Elastic Email は無料枠の通数よりも、到達率の評価が分かれていた点から外しています。
-
-**登録の障壁で失格**
-
-個人が既存のメールアドレスで登録し、すぐ検証を始められることも条件にしたため、登録や審査に追加の手続きが要るサービスは比較できませんでした。
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [SMTP2GO](https://www.smtp2go.com/) | SMTP/API、無料 1,000 通/月・カード不要。ただし登録に独自ドメインのメールアドレスが必要です。 |
-| [Twilio SendGrid](https://sendgrid.com/) | SMTP/API の大手。無料は100通/日を60日間、有料は $19.95/月から。審査で止まる報告があり、登録できませんでした。 |
-| [Amazon SES](https://aws.amazon.com/ses/) | 従量課金の SMTP/API。サンドボックス解除の申請が必要で、通数の恒久無料枠はありません。 |
-
-**規約上、本番で使いにくい**
-
-メールボックス付属の SMTP は、アカウントの送信停止や認証方式変更がアプリへ直接影響するため、専用配信サービスとは分けて考えました。
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Gmail SMTP](https://support.google.com/a/answer/176600) | 個人 Gmail は500通/日、Workspace は2,000通/日。上限超過時は最大24時間送信停止になり、差出人も個人アドレスに固定されます。 |
-| [Microsoft 365 / Outlook.com SMTP](https://learn.microsoft.com/exchange/mail-flow-best-practices/how-to-set-up-a-multifunction-device-or-application-to-send-email-using-microsoft-365-or-office-365) | Microsoft 365 は有料ライセンスが必要。公式は一括送信に適さないとしており、SMTP AUTH の基本認証は廃止予定です。 |
-
-**今回の少量送信では追加比較の必要が薄い**
-
-今回の送信量は1日数通です。Mailgun の100通/日、Postmark の100通/月でも足りる見込みのため、通数の違いを比べるより他の特徴を持つサービスを優先しました。
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Mailgun](https://www.mailgun.com/) | SMTP/API。恒久無料枠は100通/日、有料は $15/月(1万通)から。少量送信の今回の用途では無料枠で足ります。 |
-| [Postmark](https://postmarkapp.com/) | トランザクションメール重視。SMTP/API、無料100通/月(独自ドメインなし)、有料は $15/月からです。 |
-| [ZeptoMail](https://www.zoho.com/zeptomail/) | トランザクション専用 SMTP/API。最初の1万通は無料ですが、DNS 認証と審査が必要で、使い切ると有料です。 |
-
-**立地や条件が合わない**
-
-| サービス | 概要と今回の条件 |
-|---|---|
-| [Scaleway Transactional Email](https://www.scaleway.com/en/transactional-email-tem/) | 欧州向けのトランザクションメール。300通無料、以降 €0.25/1,000通。支払い方法とドメイン設定が必要です。 |
-| [Elastic Email](https://elasticemail.com/) | SMTP/API。無料枠は3,000通/月・100通/日でカード不要。到達率の評価が分かれているため今回は外しました。 |
-| [Loops](https://loops.so/) | マーケティング + トランザクションメール。無料4,000通/30日、API のみで SMTP 非対応です。 |
-| [Plunk](https://www.useplunk.com/) | SMTP/API とキャンペーン機能を備えたサービス。無料1,000通/月、有料は $0.001/通。自前ホストもできます。 |
+| [Mailgun](https://www.mailgun.com/) | 100通/日の恒久無料枠があり、今回の送信量なら足ります。 |
+| [Postmark](https://postmarkapp.com/) | トランザクションメール向けで、無料100通/月。今回の送信量なら足ります。 |
 
 ## 4. API
 
@@ -433,25 +295,11 @@ Back4App では Dockerfile の名前を指定できず、`Dockerfile` という�
 
 ### ほかの選択肢
 
-無料枠が現在利用でき、今回の構成でも試す価値がありそうなものと、料金や登録条件から今回は見送ったものを分けました。
+今回の条件でも試せそうな候補は、Azure Container Apps です。無料枠があり Japan East も選べるため、機会があれば試したいと思っています。ほかの候補は付録にまとめました。
 
-| 区分 | サービス |
+| サービス | 条件 |
 |---|---|
-| 今後試したい | Azure Container Apps |
-| 無料枠が今回の条件に合わない | Zeabur、Railway、Fly.io |
-| 登録・料金の条件が合わない | Koyeb |
-| 今回は構成が重いため見送った | AWS ECS |
-
-無料で検証を始められ、既存の Docker イメージを動かせることを基準に整理しました。この層は条件が変わるため、検証時と現在の料金ページで違いがあるものは両方記しています。
-
-| サービス | 概要・条件 | 今回の判断 |
-|---|---|---|
-| [Zeabur (Free プラン)](https://zeabur.com/pricing) | Free は自前サーバーを管理するプランです。Zeabur 管理の共有クラスタは新規プロジェクトの受付を終了しています([公式案内](https://zeabur.com/docs/en-US/server/shared-cluster))。 | Free プランだけでは Zeabur 上でアプリを動かせず、今回の条件には合いません。 |
-| [Railway](https://railway.com/) | GitHub・Docker イメージ・CLI からデプロイ可能。東京リージョンなし。Free は月 $1 分のクレジットで、常時稼働なら実質 Hobby $5/月から。 | 無料枠では今回の常時稼働条件に合いません。 |
-| [Fly.io](https://fly.io/) | Docker イメージを Firecracker VM で実行。東京あり。恒常無料枠なし、試用後はカード必須。東京の最小 VM は $2.54/月。 | 月額と VM の運用を許容する場合の候補です。 |
-| [Koyeb](https://www.koyeb.com/) | 東京のあるサーバーレスコンテナ基盤。2026 年 2 月に Mistral AI への合流を発表し、新規は Pro $29/月から。 | 無料枠がなく、今回は条件が合いませんでした。 |
-| [Amazon ECS(Fargate)](https://aws.amazon.com/fargate/) | コンテナをサーバーレス実行。Fargate 自体の無料枠はなく、新規アカウントのクレジット(最大 $200、6 か月)が利用可能。支払い方法の登録が必要。 | ALB や IAM を含めた構成・費用が今回には重いため見送りました。 |
-| [Azure Container Apps](https://azure.microsoft.com/products/container-apps) | KEDA でゼロまでスケール。Japan East あり。毎月 18 万 vCPU 秒・36 万 GiB 秒・200 万リクエストの無料枠。カードと電話番号が必要。 | 無料枠とリージョンの条件がよく、今後試したい候補です。 |
+| [Azure Container Apps](https://azure.microsoft.com/products/container-apps) | Japan East があり、無料枠は毎月 18 万 vCPU 秒・36 万 GiB 秒・200 万リクエスト。カードと電話番号の登録が必要です。 |
 
 ## 5. フロントエンド
 
@@ -505,60 +353,11 @@ Render Static Site は `routes` の Rewrite、Netlify は `_redirects` 相当の
 
 ### ほかの選択肢
 
-以下は今回の4社以外で、構成や条件が異なる場合に候補になり得るサービスです。
+今回の API を Cloud Run に置く構成なら、Firebase Hosting でも `/api/**` を同一オリジンで転送できます。ほかはリライトの宛先や費用、自前運用など条件が異なるため、付録にまとめました。
 
-| 区分 | サービス |
+| サービス | 今回の構成で使える条件 |
 |---|---|
-| `/api` のリライトができない | GitHub Pages、Surge、GitLab / Codeberg Pages、Azure Static Web Apps |
-| 今後試したい | Firebase Hosting(転送先が Cloud Run の場合) |
-| 無料枠がない、期限付き、または構成が重い | S3 + CloudFront、Amplify、Bunny、DigitalOcean App Platform(帯域 1GB/月) |
-| 静的配信にコンテナは過剰 | Fly.io / Railway に nginx、Koyeb / Zeabur |
-| 目的が違う | Coolify / Dokploy(セルフホスト)、IPFS |
-
-リライト機能がないサービスも、API を CORS で別ドメインから直接呼び出す構成なら使えます。
-
-**外部 URL へのリライトができない**
-
-今回のフロントエンドは `/api/*` を別の API 基盤へ転送する構成です。静的ファイルは配信できても外部 URL へリライトできないサービスは、同じ構成のまま比較できないため外しました。
-
-| サービス | 概要・条件 | 今回の構成での扱い |
-|---|---|---|
-| [GitHub Pages](https://pages.github.com/) | リポジトリから静的サイトを公開。サイト 1GB、帯域 100GB/月のソフト上限。EC や SaaS の商用ホスティングは禁止。 | 外部リライトなし。OSS ドキュメントやポートフォリオ向け。 |
-
-**今後試したい候補：API の配置先が合う場合**
-
-| サービス | 概要・条件 | 今回の構成での扱い |
-|---|---|---|
-| [Firebase Hosting](https://firebase.google.com/docs/hosting) | CDN 付きの静的 / SPA ホスティング。Spark は保存 10GB、転送 360MB/日でカード不要。 | rewrite 先はローカルファイル・Cloud Functions・Cloud Run。API を Cloud Run に置く今回の構成なら、`/api/**` を同一オリジンで転送できます。 |
-
-**ほかの外部リライト非対応サービス**
-
-| サービス | 概要・条件 | 今回の構成での扱い |
-|---|---|---|
-| [Surge.sh](https://surge.sh/) | CLI 1 コマンドで公開。無料は公開無制限・カスタムドメイン可、Professional は $30/月。 | 外部プロキシを確認できず、今回の `/api/*` 転送には使えません。 |
-| [GitLab Pages](https://docs.gitlab.com/user/project/pages/) | GitLab CI/CD から公開。Free はカード不要でコンピュート 400 分/月。 | 内部パスへの 200 リライトは可能ですが、外部ドメインは 301/302 のみ。 |
-| [Codeberg Pages](https://codeberg.page/) | FLOSS 向け Git ホスティングに付属する無料公開機能。FLOSS ライセンスのプロジェクトが対象。 | 外部 URL への 200 リライト不可。 |
-| [Azure Static Web Apps](https://azure.microsoft.com/products/app-service/static) | GitHub 連携の静的ホスティングと Functions 連携。Free は帯域 100GB/月・アプリ 10 個まで。 | rewrite 先はアプリ内。API を Azure Functions 等に置く構成なら候補です。 |
-| [DigitalOcean App Platform (Static Sites)](https://docs.digitalocean.com/products/app-platform/how-to/manage-static-sites/) | 静的サイト 3 個まで無料、各 1GiB/月の転送。 | 同一アプリ内にはルーティング可能ですが、外部 API への転送には使えません。 |
-
-**リライトはできるが、無料枠や構成に条件がある**
-
-無料枠の期限や構成の手間を踏まえて整理しました。
-
-| サービス | 概要・条件 | 今回の判断 |
-|---|---|---|
-| [Amazon S3 + CloudFront](https://aws.amazon.com/cloudfront/) | S3 のファイルを CDN 配信。任意の HTTP(S) オリジンへパス別に転送可能。CloudFront Free は転送 100GB・S3 5GB、超過課金なし。AWS の決済手段登録が必要。 | 無料枠でも成立しますが、S3・CloudFront・ルーティングの構成が Workers より重いため今回は選びませんでした。 |
-| [AWS Amplify Hosting](https://aws.amazon.com/amplify/hosting/) | Git 連携の静的 / SSR ホスティング。Reverse proxy rewrite で外部 URL へ転送可能。無料枠は 12 か月限定、その後は $0.15/GB。 | 期限後の従量課金を許容できる場合の候補です。 |
-| [bunny.net](https://bunny.net/) | CDN とオブジェクトストレージ。Edge Rules でパス単位に別オリジンへ転送。14 日試用後は月最低 $1、アジア向け $0.03/GB。 | 少額の実費で CDN 設定を自分で管理したい場合の候補です。 |
-
-**セルフホスト型の基盤**
-
-Coolify と Dokploy はホスティング先ではなく、自分のサーバーを管理するための基盤です。静的サイトの配信先を比較する今回の範囲から外れ、VPS の運用費と管理も増えるため選びませんでした。
-
-| サービス | 概要・条件 | 合うケース |
-|---|---|---|
-| [Coolify](https://coolify.io/) | 自分のサーバーに置く PaaS。Nginx 配信と Traefik プロキシで外部 URL への転送が可能。セルフホスト無料、Cloud は $5/月。 | VPS 上でフロントとプロキシを自分で管理したい場合。 |
-| [Dokploy](https://dokploy.com/) | Traefik 統合のセルフホスト PaaS。Static ビルドと Traefik の編集が可能。セルフホスト無料、Cloud は $4.50/月から。 | VPS 運用に慣れていて Traefik を直接設定したい場合。 |
+| [Firebase Hosting](https://firebase.google.com/docs/hosting) | API を Cloud Run に置けば `/api/**` を同一オリジンで転送できます。Spark は保存 10GB、転送 360MB/日でカード不要です。 |
 
 ## 選んだ構成
 
@@ -581,3 +380,73 @@ Coolify と Dokploy はホスティング先ではなく、自分のサーバー
 本当は、せっかく比べるなら、もっとニッチなサービスも試したかったです。でも今回の条件で選んでいくと、よく使われているサービスが残りました。広く使われているのには、やっぱり理由があるんだなと感じました。
 
 無料で使える個人開発向けのサービスは、ほかにもありそうです。ご存じの方は、ぜひコメントで教えてください！
+
+## 付録：今回の比較に入れなかった選択肢
+
+本文では、今回の構成でも有力だと思った候補に絞りました。ここでは、別の実装や条件なら候補になりそうなサービスを、比較軸ごとに並べています。料金や無料枠は変わるため、利用前に公式ページで確認してください。
+
+### DB
+
+| サービス | 今回の比較から外した理由 |
+|---|---|
+| [Cloudflare D1](https://developers.cloudflare.com/d1/) | SQLite 系のため、PostgreSQL 前提の API とクエリを移行する必要があります。 |
+| [MongoDB Atlas](https://www.mongodb.com/atlas) | ドキュメント DB で、データモデルの変更が必要です。 |
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | キーバリュー DB のため、アクセスパターンに合わせた設計変更が必要です。 |
+| [PlanetScale](https://planetscale.com/) | MySQL または別構成の PostgreSQL へ移る必要があり、無料枠もありません。 |
+| [TiDB Cloud Starter](https://www.pingcap.com/tidb-cloud-serverless/) | MySQL 互換の分散 SQL で、今回の PostgreSQL 実装をそのまま使えません。 |
+| [Turso](https://turso.tech/) | SQLite / libSQL 系で、DB とクエリの移行が必要です。 |
+| [Litestream](https://litestream.io/) | DB サービスではなく、SQLite の複製・バックアップ用ツールです。 |
+| [Fly.io Managed Postgres](https://fly.io/docs/mpg/) | 無料枠がなく、個人開発で始めるには月額がかかります。 |
+| [Oracle Cloud Always Free](https://www.oracle.com/cloud/free/) | VM に自分で構築する方式で、更新やバックアップの運用が増えます。 |
+| [Koyeb Postgres](https://www.koyeb.com/docs/databases) | 検証時に利用登録できず、比較できませんでした。 |
+
+### 写真ストレージ
+
+| サービス | 今回の比較から外した理由 |
+|---|---|
+| [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | S3 API ではなく、専用 SDK を使うサービスです。 |
+| [Bunny Storage](https://bunny.net/storage/) | 独自 REST API のため、既存の S3 アダプタを使えません。 |
+| [Cloudflare Images](https://www.cloudflare.com/developer-platform/products/cloudflare-images/) | 保存・変換・配信をまとめて任せる画像サービスで、今回の単純な保存用途とは異なります。 |
+| [ImageKit](https://imagekit.io/)、[Cloudinary](https://cloudinary.com/)、[Uploadcare](https://uploadcare.com/)、[UploadThing](https://uploadthing.com/) | 画像変換やアップロード UI も含むサービスで、今回は必要としませんでした。 |
+| [Amazon S3](https://aws.amazon.com/s3/)、[Google Cloud Storage](https://cloud.google.com/storage)、[Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs) | 利用条件や API が異なり、長期無料で同じ条件にそろえる比較から外しました。 |
+| [Wasabi](https://wasabi.com/cloud-object-storage) | S3 互換ですが、最低課金量が今回の少量利用に合いません。 |
+| [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces)、[Hetzner Object Storage](https://www.hetzner.com/storage/object-storage/) | 月額やリージョンなど、今回の無料枠中心の条件とは異なります。 |
+| [MinIO](https://www.min.io/) | 自前運用が必要です。開発環境では S3 API の動作確認に使いました。 |
+| [Storj](https://www.storj.io/) | 分散型の S3 互換ストレージですが、最低料金があります。 |
+| [Render Disks](https://render.com/docs/disks) | 公開用オブジェクトストレージではなく、インスタンスに付けるブロックストレージです。 |
+
+### メール
+
+| サービス | 今回の比較から外した理由 |
+|---|---|
+| [SMTP2GO](https://www.smtp2go.com/) | 無料枠はありますが、登録に独自ドメインのメールアドレスが必要でした。 |
+| [Twilio SendGrid](https://sendgrid.com/) | 検証時に登録審査を通過できませんでした。 |
+| [Amazon SES](https://aws.amazon.com/ses/) | サンドボックス解除の申請が必要です。 |
+| [Gmail SMTP](https://support.google.com/a/answer/176600)、[Microsoft 365 SMTP](https://learn.microsoft.com/exchange/mail-flow-best-practices/how-to-set-up-a-multifunction-device-or-application-to-send-email-using-microsoft-365-or-office-365) | メールボックス付属の SMTP で、アプリ通知の継続運用とは条件が異なります。 |
+| [ZeptoMail](https://www.zoho.com/zeptomail/) | 初回の無料通数後は有料で、DNS 認証などの設定も必要です。 |
+| [Scaleway Transactional Email](https://www.scaleway.com/en/transactional-email-tem/) | EU 向けサービスのため、今回のリージョン条件とは合いません。 |
+| [Elastic Email](https://elasticemail.com/) | 無料枠はありますが、今回は少量送信で別の候補を優先しました。 |
+| [Loops](https://loops.so/) | API 送信が中心で SMTP に対応していません。 |
+| [Plunk](https://www.useplunk.com/) | キャンペーンや自前ホストも含むため、今回より広い用途向けです。 |
+
+### API
+
+| サービス | 今回の比較から外した理由 |
+|---|---|
+| [Zeabur](https://zeabur.com/pricing) | 無料プランでは共有クラスタに新規アプリを配置できず、自前サーバー管理が中心です。 |
+| [Railway](https://railway.com/) | 無料クレジットでは常時稼働を続けにくく、東京リージョンもありません。 |
+| [Fly.io](https://fly.io/) | 東京リージョンはありますが、恒久無料枠がなく VM の運用も必要です。 |
+| [Koyeb](https://www.koyeb.com/) | 無料枠がなく、今回の条件では有料プランが必要です。 |
+| [Amazon ECS (Fargate)](https://aws.amazon.com/fargate/) | 実行費用に加え、周辺の AWS 構成も必要で今回には重いと判断しました。 |
+
+### フロントエンド
+
+| サービス | 今回の比較から外した理由 |
+|---|---|
+| [GitHub Pages](https://pages.github.com/)、[Surge](https://surge.sh/) | 外部 API へのパス別リライトを今回の用途で確認できませんでした。 |
+| [GitLab Pages](https://docs.gitlab.com/user/project/pages/)、[Codeberg Pages](https://codeberg.page/) | 外部 URL への内部リライトに対応しない、または制約があります。 |
+| [Azure Static Web Apps](https://azure.microsoft.com/products/app-service/static)、[DigitalOcean App Platform](https://docs.digitalocean.com/products/app-platform/how-to/manage-static-sites/) | 主にアプリ内のルーティング向けで、別基盤の API へ転送する今回の条件とは合いません。 |
+| [Amazon S3 + CloudFront](https://aws.amazon.com/cloudfront/) | 構成すれば転送できますが、設定するサービスが増えます。 |
+| [AWS Amplify Hosting](https://aws.amazon.com/amplify/hosting/) | 外部リライトに対応しますが、無料枠は期限付きです。 |
+| [bunny.net](https://bunny.net/) | 外部転送は可能ですが、試用後は少額の月額料金がかかります。 |
+| [Coolify](https://coolify.io/)、[Dokploy](https://dokploy.com/) | 自分のサーバーを管理する基盤で、静的サイトのホスティング比較とは性質が異なります。 |
