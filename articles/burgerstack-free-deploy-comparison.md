@@ -147,8 +147,6 @@ PostgreSQL 以外へ移る場合は pgx、sqlc のクエリやマイグレーシ
 | [Oracle Cloud Always Free](https://www.oracle.com/cloud/free/) | 無料 VM に自分で PostgreSQL を構築できますが、OS 更新やバックアップなどの運用が必要です。低利用が続く VM は回収される場合があります。 |
 | [Koyeb Postgres](https://www.koyeb.com/docs/databases) | マネージド PostgreSQL。検証時は利用登録ができず、今回の測定には含められませんでした。 |
 
-### 今回選んだもの
-
 ## 2. 写真ストレージ
 
 ### 今回比べた 4 つ
@@ -207,21 +205,21 @@ R2 はアップロードに使う S3 API のエンドポイントと、画像を
 
 | 区分 | サービス |
 |---|---|
-| 今後試したい | Vercel Blob、Bunny Storage |
+| S3 互換ではないため今回の比較対象外 | Vercel Blob、Bunny Storage |
 | 今回の用途と違う(画像変換に特化) | Cloudflare Images、ImageKit、Cloudinary、Uploadcare / Uploadthing |
 | 無料枠がない、または期限付き | AWS S3、Google Cloud Storage、Azure Blob、Wasabi、DigitalOcean Spaces、Hetzner |
 | 運用が重い、条件が読めない | MinIO(セルフホスト)、Storj、Render Disk |
 
 選ばなかったものの概要です。
 
-**S3 互換ではないストレージ**
+**S3 互換ではないため今回の比較対象外**
 
 | サービス | 概要と今回の条件 |
 |---|---|
 | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | 独自 SDK(`@vercel/blob`)で使う Vercel 向けストレージ。Hobby は保存 1GB・転送 10GB/月まで。Vercel/Next.js とまとめて使う場合の候補です。 |
 | [Bunny Storage](https://bunny.net/storage/) | 独自 REST API の CDN 直結ストレージ。14 日試用後は $0.01/GB 月、最低 $1/月。Bunny CDN への転送は無料です。 |
 
-専用 SDK や別 API のため、今回の S3 アダプタをそのままでは使えません。コード変更を許容する場合に試したい候補です。
+専用 SDK や別 API のため、今回の S3 アダプタを使う比較には含めていません。
 
 **画像変換・アップロード機能が必要な場合の候補**
 
@@ -290,7 +288,7 @@ R2 はアップロードに使う S3 API のエンドポイントと、画像を
 
 ドメインなしで送れたのは Mailjet だけでした。ドメインを認証したら 4 社とも送れて、迷惑メールにも入りませんでした。
 
-Mailjet は認証していないドメインのアドレスを差出人にしても送信できる結果でした。手軽さよりも、認証されていない差出人から送れないことを重視し、私は Resend を選びました。送信ドメインの検証を求める仕組みのほうが、設定ミスやキー流出時の誤送信・悪用を防ぎやすいと考えたためです。
+Mailjet は認証していないドメインのアドレスを差出人にしても送信できる結果でした。
 
 ### 実際に組み込んで気づいた癖
 
@@ -306,7 +304,7 @@ Resend の共有ドメインは送信先が限られていました。開発中�
 
 ### 今回選んだもの
 
-今回は Resend を選びました。送信量は1日数通なので無料枠で十分です。それ以上に、ドメイン認証を必須にする点を重視しました。未認証の差出人でも送れてしまう Mailjet は、セキュリティ上このアプリには適さないと判断しました。
+今回は Resend を選びました。送信量は1日数通なので無料枠で十分です。それ以上に、送信ドメインの認証を必須にする点を重視しました。Mailjet は未認証の差出人でも送信できたため、セキュリティ上このアプリには適さないと判断しました。
 
 ### ほかの選択肢
 
@@ -415,7 +413,7 @@ API をインターネットへ公開するなら、動くか、速いか、安�
 
 この軸だけなら、組み込みの制限をすぐ足せる Northflank が扱いやすく、細かく構成できる Cloud Run が最も強力です。Render は TLS と DDoS 対策を意識せず始められますが、アプリらしいアクセスに見える攻撃は Go 側で抑える必要があります。Back4App は今回使った Containers では基盤側の選択肢を確認できず、アプリ側の責任が大きくなります。
 
-公式資料をもとに比較しました。Cloud Run は [security overview](https://docs.cloud.google.com/run/docs/securing/security) と [ingress の制限](https://docs.cloud.google.com/run/docs/securing/ingress)、Northflank は [network security](https://northflank.com/docs/v1/application/network/networking-on-northflank) と [path-based security policies](https://northflank.com/docs/v1/application/network/create-path-based-security-policies)、Render は [Web Services](https://render.com/docs/web-services) と [DDoS protection](https://render.com/docs/ddos-protection)、Back4App は [Containers の custom domain](https://www.back4app.com/docs-containers/custom-domain) を参照しています。
+各社の公式資料を参考にしました。
 
 ### 実際に組み込んで気づいた癖
 
