@@ -138,16 +138,16 @@ Backblaze B2(米・上場)は、S3 互換の老舗ストレージです。最初
 
 ### 実測
 
-300KB の JPEG を各 50 回測りました。
+300KB の JPEG を各 50 回測りました(Supabase Storage は、DB と同じ東京のプロジェクトで 3 回測った中央値です)。
 
-| 候補 | PUT | GET | GET のばらつき |
+| 候補 | PUT | GET | GET のばらつき(標準偏差) |
 |---|---|---|---|
-| Tigris | 89ms | 26ms | 小 |
-| Supabase Storage | 433ms | 39ms | 大(最大 780ms) |
-| Cloudflare R2 | 160ms | 81ms | 中 |
-| Backblaze B2 | 233ms | 281ms | 最小(8.5ms) |
+| Tigris | 89ms | 26ms | 19ms |
+| Supabase Storage | 161ms | 36ms | 3.8ms |
+| Cloudflare R2 | 160ms | 81ms | 37ms |
+| Backblaze B2 | 233ms | 281ms | 8.5ms |
 
-速さでは Tigris が PUT・GET とも最速で、GET 26ms は R2 の 3 分の 1 でした。Supabase は中央値こそ速いものの、2 割ほどの閲覧で目に見えて待たされました。B2 は遅い一方で、今回の計測では安定していました。
+速さでは Tigris が PUT・GET とも最速で、GET 26ms は R2 の 3 分の 1 でした。Supabase は GET が 2 番目に速く、ばらつきは 4 社で最も小さい結果でした。B2 は遅い一方で、Supabase に次いで安定していました。
 
 平均値だけでなく、ばらつきや転送コストも見る必要があります。
 
